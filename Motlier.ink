@@ -10,6 +10,7 @@ VAR rep_town = 0
 VAR rep_Azer = 0
 VAR rep_Tib = 0
 VAR rep_Alice = 0
+VAR rep_Borris = 0
 VAR observed = false
 
 // Data Tables
@@ -27,66 +28,66 @@ LIST menu =
     ~ coins -= cost
     ~ return coins
     
-=== function repChange(varName, amount) ===
-    ~ varName += amount
-    ~ return varName
+=== function repChange( ref r, amount) ===
+    ~ r += amount
+    ~ return repChange
 
 // Intro Blurb
 === Intro ===
-Motlier is a small village which acts as the lumber supplier to the surrounding area. Founded many generations ago, the town is now run by descendants of the same families upon which the town was built. Despite its humble looks, Motlier’s success rests upon the enchanted forest to the east. Blessed by the Mother, every tree cut down regrows under the light of the full moon. Being very practical folk, the townspeople use the magic to their advantage and have been supplying lumber to the entire region for generations.
+Motlier is a small village which acts as the lumber supplier to the surrounding area. Founded many generations ago, the town is now run by descendants of the same families upon which the town was built. Despite it's humble looks, Motlier’s success rests upon the enchanted forest to the east. Blessed by the Mother, every tree cut down regrows under the light of the full moon. Being very practical folk, the townspeople use the magic to their advantage and have been supplying lumber to the entire region for generations.
 -> BuildCharacter
 // Character builder
 == BuildCharacter ==
 
-Choose a race
+What visage shall you present to the townsfolk?
 
-+ [Dragonborn]
++ [Dragonborn] Your scales shimmer { ~ jade | ruby | bronze | emerald | sapphire } in the moonlight.
     ~ race = "Dragonborn"
     -> Class
-+ [Dwarf]
++ [Dwarf] Your thick beard is { ~ a startling shade of red | woven with wooden beads | braided with bits of bone }
     ~ race = "Dwarf"
     -> Class
-+ [Elf]
++ [Elf] Your gaze is heavy with the weight of time.
     ~ race = "Elf"
     -> Class
-+ [Human]
++ [Human] You walk tall, { ~ with an air of self-importance | your hair braided down your back | bright eyes full of curiosity. }
     ~ race = "Human"
     -> Class
 
 == Class ==
 
-Choose a class
+And what kind of profession do you practice?
 
-+ [Barbarian]
++ [Barbarian] You prefer to do negotiations the old-fashion way: with { ~ your bare hands | fists | the maul at your back. }
     ~ char_class = "Barbarian"
     -> Origin
-+ [Druid]
++ [Druid] Life is about balance, and nothing is more important than protecting it.
     ~ char_class = "Druid"
     -> Origin
-+ [Rogue] 
++ [Rogue] Life is more fun when it's lived on someone else's coin.
     ~ char_class = "Rogue"
     -> Origin
-+ [Wizard]
++ [Wizard] You blow up ONE lab and they relegate you to field research...
     ~ char_class = "Wizard"
     -> Origin
 
 == Origin ==
 
-Choose an origin
+What of your origins?
 
-+ [Acolyte]
++ [Acolyte] Would you care to hear about our lord and savior, Orcus?
     ~ char_origin = "Acolyte"
     ~ coins = 80
     -> Start
-+ [Criminal]
++ [Criminal] Whoever said crime isn't a real job never hid from the guards.
     ~ char_origin = "Criminal"
     ~ coins = 160
     -> Start
-+ [Sage]
++ [Sage] Wisdom is it's own reward. The coin is just a bonus.
     ~ char_origin = "Sage"
-    ~ coins = 80
+    ~ coins = 60
     -> Start
-+ [Soldier]
++ [Soldier] A good soldier doesn't stoop to gate bribes. They shake down criminals instead.
     ~ char_origin = "Soldier"
     ~ coins = 140
     -> Start
@@ -96,18 +97,18 @@ Choose an origin
 
 You arrive in Motlier just before sunset on the night of the full moon. Weary from a day of hard travel, your first sight is the warm light of the Ram's Horn Tavern and Inn. A noticeboard stands just outside the entrance, littered with parchment.
 
-+ Head inside
++ [Head inside]
     -> Tavern
  
-+ Inspect the noticeboard
++ [Inspect the noticeboard]
     ~ sawNotice = true
     -> Noticeboard
 
 = Noticeboard
 
-The most prominent flyer on the board offers a reward for helping the town deal with vermin. It says to see Azer for more details and has a seal stamped in the bottom with a flaming tree. Another, written in an angry looking scrawl, offers 50 copper pieces for undamaged goblin hide brought to Tib. The third offers a special at the tavern: 1 honeycake made with Bristleberry honey from the town nearby added to any meal for only 2 silver extra. Below is a drawing of a small cake drizzled with honey and topped with purple berries.
+The most prominent flyer on the board offers a reward for helping the town deal with vermin. It says to see Azer for more details and has a seal stamped at the bottom with a flaming tree. Another, written in an angry looking scrawl, offers 50 copper pieces for undamaged goblin hide brought to Tib. The third offers a special at the tavern: 1 honeycake made with Bristleberry honey from the town nearby added to any meal for only 2 silver extra. Below is a drawing of a small cake drizzled with honey and topped with purple berries.
 
-+ Head inside
++ [Head inside]
     -> Tavern
 
 // Tavern Stitches
@@ -117,16 +118,16 @@ The most prominent flyer on the board offers a reward for helping the town deal 
 -> Seated
 
 = Seated
-
+{ once: The half-orc sets down a tankard before a { race == "Dwarf": fellow } dwarf with stones braided into his beard before hurrying over to you with a jovial smile. "Good evening, friend! Welcome to Ram's Horn Tavern and Inn. Name's Borris Grizzlespark. Hungry? Thirsty?" }
 ~ temp choice_done = false
 { choice_done:
     -> Seated
 - else: 
-    * Order a drink -> Menu
-    * Look around -> Observe
+    * "I would kill for some food." -> Menu
+    * [Look around] -> Observe
     ~ observe = true
-    * Get a room -> Bed
-    * { sawNotice } Ask about noticeboard 
+    * "I'm worn from my travels. A bed is all I ask." -> Bed
+    * { sawNotice } [Ask about noticeboard]
      -> Jobs
     -> Tavern
 ~ choice_done = true
@@ -134,7 +135,9 @@ The most prominent flyer on the board offers a reward for helping the town deal 
 
 = Menu
 { coins > 0:
-    You’ve got {coins} coins jingling in your purse.
+    "We've got a quite the spread this time of year. Me and Robert, he's the butcher over at Blade and Twine, we hunt the boars ourselves. The vegetables are grown fresh at Fairhaven Farms, just down the road. And not to brag, but my ale beat Gredga's brew two years running!"
+    
+        You’ve got {coins} coins clinking in your pouch.
 
     + { coins >= LIST_VALUE(menu.Roasted_Boar) } Roasted Boar (7sp)
         ~ pay(LIST_VALUE(menu.Roasted_Boar))
@@ -167,10 +170,10 @@ The most prominent flyer on the board offers a reward for helping the town deal 
         The mead is sweet with a deep purple color, with the sharp tartness of Bristleberries to cut through the sweetness.
     -> Menu
     
-* Stop eating
+* Stop eating.
     -> Seated
 - else:
-    Your purse is empty—time to move on.
+    Looks like you're fresh out of coins. Guess it's time to stop eating.
     -> Seated
 }
 
@@ -178,49 +181,86 @@ The most prominent flyer on the board offers a reward for helping the town deal 
 ~ observed = true
 { 
 - char_class == "Wizard":
-    Traces of the arcane linger along the wood of the bar. You can almost feel the touch of the Moonshadow realm. How did a half-orc come across something like this? 
+    Traces of the arcane linger along the wood of the bar. You can almost feel the touch of the Moonshadow realm. How did a half-orc come across something like this?
+    -> Borris
 - char_class == "Rogue":
     The patrons of the inn don't seem to mind that their pockets hang open, coins glittering within. Are they naive, or is there a reason for their lax security?
+    -> Borris
 - char_class == "Druid": 
     The bar at the counter is made of an unusual wood- black as obsidian and swirled with faint silver grain lines. What kind of tree was felled to craft such a bar?
+    -> Borris
 - char_class == "Barbarian":
-    You notice the halfling has stopped playing on the stage and is now armwrestling a man with hawkish features. Though he is twice her height and well built, she slams his hand upon the table with ease. Perhaps she would be up to a challenge?
-        -> SpeakWithAzer
+    You notice the halfling has stopped playing on the stage and is now armwrestling a man with hawkish features. Though he is twice her height and well built, she slams his hand upon the table with ease. Borris catches your gaze and chuckles under his breath. "Azer never learns. Maybe Alice should run the local militia..."
+        -> ArmWrestling
 - else == You notice nothing in particular.
     }
     -> Seated
+    
+= Borris
+{
+- char_class == "Wizard":
+    "How did you get your hands on wood from the Moonshadow Realm?"
+    ~ repChange(rep_Borris, 1)
+    -> Borris_Counter
+- char_class == "Rogue":
+    * "You all seem a bit trusting with your coins. Are you not concerned with theft?"
+    ~ repChange(rep_Borris, -1)
+    -> Motlier_Crime
+    * "You seem like friendly folk. Do you get a lot of crime here?"
+    ~ repChange(rep_Borris, 1)
+    -> Motlier_Crime
+    - char_class == "Druid": 
+    "This bar is most unusual. May I inquire to the wood's origin?"
+    ~ repChange(rep_Borris, 2)
+    -> Borris_Counter
+}
 
+= Borris_Counter
+
+{ 
+- char_class == "Wizard": "Moonshadow? Oh, the bar! She's a beauty, isn't she?" he pats the surface with a fond smile. "Was a gift from my mum when I opened. Not sure where she got it. Never got the chance to ask."
+    -> Seated
+- char_class == "Druid": "She's something special, isn't she?" He smiles with pride, rapping his knuckles on the surface. "Not sure what kind of tree she's from. Was a gift from my mum. Take good care of it, though. Lot of respect for trees here."
+    -> Seated
+}
+
+= Motlier_Crime
+"We don't really get a lot of crime. Azer has eyes like a hawk and is an expert tracker. Anyone trying to steal from us wouldn't get very far."
+    -> Seated
+    
 = Bed
 
-Rooms are 10 silver piece a night.
-* Rent a room
-    { coins >= 10 }
-    ~ pay(-10)
+"You'd like a room?" The half-orc grins, his lips pulling back from his small tusks. "Excellent, glad you'll be staying with us a while longer. The wooden frames of our beds are carved by the blacksmith, if you can believe it! Futhar may be a smith by trade, but his woodworking skills truly are the best in the region. Sorry, I shouldn't keep a sleepy traveler waiting. Beds are 10 silver a night. That fine by you?"
+* { coins >= 10 } "A room sounds wonderful."
+    ~ pay(10)
 -> Room
-* Sleep outside
+* "Ten silver! That's a bit pricey, isn't it?"
+    ~ repChange(rep_town, -1)
+    ~ repChange(rep_Borris, -2)
 -> Outside
 
 = Jobs
-* Ask about Tib
+* [ Tibs Notice] "Can you tell me about Tib's notice?" 
     -> TibNotice
-* Ask about Azer -> AzerNotice
+* [Azer's Notice] "Which one is the fellow named Azer?"
+    -> AzerNotice
 
 = TibNotice
 
-"Oh, Tib is a little... out there these days. He's got it in for the goblins. Makes shoes and bags out of their hides. Bit morbid, but can't say they aren't solid..."
-* Whose Tib? -> TibCharDes
+"Oh, Tib is a little... out there these days. He's got it in for the goblins. Makes shoes and bags out of their hides. Bit morbid, but can't say they aren't solid..." Borris frowns, his thick brow creasing with worry. "Azer won't let him on hunts anymore. Says he endangers everyone with his obsession."
+* "Which one is Tib?" -> TibCharDes
     -> Jobs
     
 = AzerNotice
 
-"Azer is in charge of the local militia. Between him and Percy in Motlier, we rarely have need for the Caidour's soldiers. Him and the Mayor decided to outsource a little help after a sudden resurgence of kobolds and goblins in the area. He's over there with Alice, the halfling, if you're curious. The tall one, with a bit of a sharp angle to his nose."
+"Azer is in charge of the local militia," Borris shakes his head a little, his smile falling. "Don't like fighting. Don't care much for soldiers, either. But with all the kobolds and goblins popping up, he and the Mayor decided to outsource a little help. He's the tall one, with the sharp nose sitting with the halfling."
     -> SpeakWithAzer
     -> Seated
 
 //Azer Dialogue
 = SpeakWithAzer
 Azer turns towards you as you approach, his hawkish features making you wonder if there isn't some Arakocra in his family history. "Yes? What is it?" he asks in a brusque manner.
-    * { sawNotice } Ask about flyer
+    * { sawNotice } "I saw your flyer...[]and was wondering about the job."
     -> AzerJob
     * { observed == true && char_class == "Barbarian" }
     -> ArmWrestling
@@ -274,7 +314,7 @@ Azer turns towards you as you approach, his hawkish features making you wonder i
     -> MoreInformation
 
 = ArmWrestling //Option for character personality building.
-* [Comment on his loss] "Saw you lose to the halfling here. Aren't you supposed to be leading the militia?"
+* [Patronize Azer] "Saw you lose to the halfling here. Aren't you supposed to be leading the militia?"
         "Careful, traveler. Alice is stronger than she looks."
             * * [Challenge Alice] "That so? Well, how about it then, Alice?"
                 The halfling grins in response, offering her short arm on the table.
@@ -283,7 +323,7 @@ Azer turns towards you as you approach, his hawkish features making you wonder i
             * * [Challenge Azer] "Or you're just the brains behind the militia. Let's find out?" You take a seat beside the halfling, resting one { race == "Dragonborn": scaly} { race == "Dwarf": short, beefy } { race == "Elf": slender } { race == "Human": thick, muscular } arm on the table with a grin.
                 "Hmph, a wager then. If I beat you, I've got some work you'll do for free. If you beat me, you get half the purse, no strings attached. Still want to challenge me?
                 -> ChallengeAzer
-* [Compliment him] "Smart of you to not waste your strength like that. Especially when you have a pest control problem."
+* [Flatter Azer] "Smart of you to not waste your strength like that."
         "Hmph, yes well. It is important for me to not waste too much of my strength on silly games. What brings you to our town, traveler? Are you looking for work?
         * * Always!
         --> AzerJob
@@ -294,17 +334,23 @@ Azer turns towards you as you approach, his hawkish features making you wonder i
 ~ temp roll = RANDOM(1, 20)
 You roll a { roll }.
 { roll > 12: 
-He puts up a bit of a fight, but he's no match for your seasoned muscles. You beat him with minimal effort. "I see you aren't all talk. Very well, a deal's a deal. Take your gold and go."
+He puts up a bit of a fight, but he's no match for your seasoned muscles. You beat him with minimal effort. "I see you aren't all talk. Very well, a deal's a deal. Take your gold and go." You make your way back to the bar, the extra coin jingling in your pouch.
+Boris greets you with a smile. "What can I do for you, friend?"
     ~ coins += 200
 - else: Either he was bluffing or the old halfling truly was stronger than she looked. "Ha! Not so strong, are you? I'll see you tomorrow morning. Sunrise, and don't be late."
+You make your way back to the bar, your ego a little bruised.
+Boris greets you with a smile. "What can I do for you, friend?"
 } -> Seated
 = ChallengeAlice
 ~ temp roll = RANDOM(1, 20)
 You roll a { roll }.
     { roll > 16: 
-The grey haired halfling puts up a surprisingly good fight, managing to resist you and even start to tip your hands before you slam hers down on the table. "Ha! A strong one! That was a good challenge. Though if I was a good twenty years younger, I might have had you."
+The grey haired halfling puts up a surprisingly good fight, managing to resist you and even start to tip your hands before you slam hers down on the table. "Ha! A strong one! That was a good challenge. Though if I was a good twenty years younger, I might have had you." You bid her a pleasent night and head back to the bar.
+Boris greets you with a smile. "What can I do for you, friend?"
+
     ~ repChange(rep_Alice, 2)
-- else: It would appear Azer was correct: despite her age, Alice resists you, tipping your arm slowly and with gritted teeth slams it onto the table. She smiles jovially at you and shakes out her hand. "Amazing, you put up quite the fight! Good challenge, traveler."
+- else: It would appear Azer was correct: despite her age, Alice resists you, tipping your arm slowly and with gritted teeth slams it onto the table. She smiles jovially at you and shakes out her hand. "Amazing, you put up quite the fight! Good challenge, traveler." You make your way back to the bar and rethink your career.
+Boris greets you with a smile. "What can I do for you, friend?"
     ~ repChange(rep_Alice, 1)
 } -> Seated
 
@@ -338,7 +384,7 @@ The grey haired halfling puts up a surprisingly good fight, managing to resist y
 -> Seated
 
 = SpeakWithTib
-You get up from your spot at the bar and make your way to where the man is standing. He eyes you warily, noting the 
+You get up from your spot at the bar and make your way to where the man is standing. He eyes you warily, noting the <>
 { 
 - char_class == "Barbarian": muscles corded beneath your skin and the massive maul you carry. "Finally, someone with some meat on their bones. You looking for work? And maybe a new pair of boots?"
     ~ repChange(rep_Tib, 2)
@@ -351,6 +397,7 @@ You get up from your spot at the bar and make your way to where the man is stand
 - else == tankard in your hand.
 }
 * { char_class == "Barbarian" } "Work would be welcome! I can live without shoes though."
+-> TibJobOffer
 { char_class == "Druid":
     * [Of course] "Of course I eat meat. Nature is about balance."
     ~ repChange(rep_Tib, 2)
@@ -389,7 +436,8 @@ The room is clean, with four empty beds to choose from. Each bed has a small che
     -> Sleep
 
 = Outside
-Seems like you've got a choice of where to sleep. A stable beside the tavern has a pile of hay and no horses. There's also some grass that's slightly overgrown around the back of the inn. If you're really not picky, you could definitely just sleep on the packed earth in the town center.
+Borris looks hurt, a frown creasing his face. "Got to make money, don't I? You can sleep outside if you like. There's hay in the stables."
+Looks like you've hurt his feelings. As he said, the stable beside the tavern has a pile of hay in the corner. You also spot some thick grass around the back of the inn. If you're really not picky, you could sleep on the packed earth in the town center.
     * Stable
         The stable is dry and a little warm, but doesn't provide you with a view of the moon. However, you've got a picture-perfect view of the lumber yard. If you can stay awake, perhaps you can watch the trees grow.
         -> Sleep
@@ -402,11 +450,14 @@ Seems like you've got a choice of where to sleep. A stable beside the tavern has
 
 
 = QuestAccepted
-You got a quest!
+You got a quest! You make your way back to the bar, looking forward to the next day.
+Boris greets you with a smile. "What can I do for you, friend?"
+~ repChange(rep_town, 2)
 -> Seated
 
 = QuestRejected
-This quest wasn't for you.
+This quest wasn't for you. You make your way back to the bar, where Boris greets you with a smile.
+~ repChange(rep_town, -2)
 -> Seated
 // End
 = Sleep
@@ -421,7 +472,7 @@ The town thinks highly of you.
 - rep_town == -1:
 The town is distrustful of you.
 - rep_town <= -2:
-The town is openly hostile towards you.
+The town dislikes you.
 }
 { 
 - rep_Azer == 0:
@@ -433,7 +484,7 @@ The town is openly hostile towards you.
 - rep_Azer == -1:
     Azer is distrustful of you.
 - rep_Azer <= -2:
-    Azer is openly hostile towards you.
+    Azer dislikes you.
 }
 { 
 - rep_Tib == 0:
@@ -445,7 +496,7 @@ The town is openly hostile towards you.
 - rep_Tib == -1:
     Tib is distrustful of you.
 - rep_Tib <= -2:
-    Tib is openly hostile towards you.
+    Tib dislikes you.
 }
 { 
 - rep_Alice == 0:
@@ -457,6 +508,18 @@ The town is openly hostile towards you.
 - rep_Alice == -1:
     Alice is distrustful of you.
 - rep_Alice <= -2:
-    Alice is openly hostile towards you.
+    Alice dislikes you.
+}
+{ 
+- rep_Borris == 0:
+    Borris is indifferent to you.
+- rep_Borris == 1:
+    Borris thinks positively of you.
+- rep_Borris > 1:
+    Borris thinks highly of you.
+- rep_Borris == -1:
+    Borris is distrustful of you.
+- rep_Borris <= -2:
+    Borris dislikes you.
 }
 -> END
