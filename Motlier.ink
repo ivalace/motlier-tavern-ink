@@ -79,7 +79,7 @@ What of your origins?
     ~ char_origin = "Acolyte"
     ~ coins = 80
     -> Start
-+ [Criminal] Whoever said crime isn't a real job never hid from the guards.
++ [Criminal] If crimes not a job, why does it pay so well?
     ~ char_origin = "Criminal"
     ~ coins = 160
     -> Start
@@ -461,7 +461,8 @@ This quest wasn't for you. You make your way back to the bar, where Boris greets
 -> Seated
 // End
 = Sleep
-You have { coins } left.
+End of day summary:
+You have { coins } silver left.
 { 
 - rep_town == 0:
     The town is indifferent to you.
